@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+
+<html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Shodibazar: Business & Safe Food Analysis</title> <script src="https://cdn.tailwindcss.com"></script> <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet"> <style> body { font-family: 'Inter', sans-serif; background-color: #F9FAFB; color: #1F2937; }
+
+    /* Chart Container Strict Styling */
+    .chart-container { 
+        position: relative; 
+        width: 100%; 
+        margin-left: auto; 
+        margin-right: auto; 
+        height: 350px; 
+        max-height: 400px; 
+    }
+    @media (min-width: 768px) { 
+        .chart-container { height: 400px; } 
+    }
+    
+    .nav-item.active { background-color: #ECFDF5; color: #059669; border-right: 4px solid #059669; }
+    .hidden-section { display: none; opacity: 0; transition: opacity 0.5s ease-in-out; }
+    .visible-section { display: block; opacity: 1; animation: fadeIn 0.5s forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; }
+    ::-webkit-scrollbar-thumb { background: #10B981; border-radius: 4px; }
+    
+    /* Interactive Card Styling */
+    .process-card { transition: all 0.3s ease; border-left: 4px solid transparent; cursor: pointer; }
+    .process-card:hover { transform: translateX(5px); border-left-color: #F59E0B; background-color: #FFFBEB; }
+    .process-active { border-left-color: #10B981; background-color: #ECFDF5; }
+</style>
+</head> <body class="flex h-screen overflow-hidden">
+
+<!-- SIDEBAR NAVIGATION -->
+<aside class="w-64 bg-white shadow-xl hidden md:flex flex-col z-10 transition-all duration-300">
+    <div class="p-6 border-b border-gray-100">
+        <h1 class="text-2xl font-extrabold text-emerald-600 tracking-tight">SHODIBAZAR</h1>
+        <p class="text-xs text-gray-400 mt-1 font-semibold uppercase tracking-wider">Analytics Dashboard</p>
+    </div>
+    <nav class="flex-1 overflow-y-auto py-4">
+        <button onclick="showSection('overview')" class="nav-item active w-full text-left px-6 py-4 hover:bg-gray-50 transition-colors flex items-center group">
+            <span class="text-lg mr-3 group-hover:scale-110 transition-transform">📊</span>
+            <span class="font-medium">Overview</span>
+        </button>
+        <button onclick="showSection('financials')" class="nav-item w-full text-left px-6 py-4 hover:bg-gray-50 transition-colors flex items-center group">
+            <span class="text-lg mr-3 group-hover:scale-110 transition-transform">📈</span>
+            <span class="font-medium">Financial Trends</span>
+        </button>
+        <button onclick="showSection('supply-chain')" class="nav-item w-full text-left px-6 py-4 hover:bg-gray-50 transition-colors flex items-center group">
+            <span class="text-lg mr-3 group-hover:scale-110 transition-transform">🚜</span>
+            <span class="font-medium">Supply Chain</span>
+        </button>
+        <button onclick="showSection('comparison')" class="nav-item w-full text-left px-6 py-4 hover:bg-gray-50 transition-colors flex items-center group">
+            <span class="text-lg mr-3 group-hover:scale-110 transition-transform">⚖️</span>
+            <span class="font-medium">Market Position</span>
+        </button>
+        <button onclick="showSection('customers')" class="nav-item w-full text-left px-6 py-4 hover:bg-gray-50 transition-colors flex items-center group">
+            <span class="text-lg mr-3 group-hover:scale-110 transition-transform">👥</span>
+            <span class="font-medium">Customer Insights</span>
+        </button>
+    </nav>
+    <div class="p-6 border-t border-gray-100">
+        <div class="bg-emerald-50 rounded-lg p-4">
+            <h4 class="text-sm font-bold text-emerald-800">Status: Active</h4>
+            <p class="text-xs text-emerald-600 mt-1">Data updated: Dec 2025</p>
+        </div>
+    </div>
+</aside>
+
+<!-- MOBILE HEADER -->
+<div class="md:hidden fixed top-0 w-full bg-white shadow-md z-20 p-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold text-emerald-600">SHODIBAZAR</h1>
+    <button onclick="document.querySelector('aside').classList.toggle('hidden'); document.querySelector('aside').classList.toggle('flex'); document.querySelector('aside').classList.toggle('absolute'); document.querySelector('aside').classList.toggle('h-full');" class="text-gray-600 focus:outline-none">
+        ☰
+    </button>
+</div>
+
+<!-- MAIN CONTENT AREA -->
+<main class="flex-1 overflow-y-auto p-4 md:p-8 pt-20 md:pt-8 bg-gray-50 relative">
+    
+    <!-- SECTION 1: OVERVIEW -->
+    <section id="overview" class="visible-section max-w-7xl mx-auto">
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-gray-800">Executive Summary</h2>
+            <p class="text-gray-600 mt-2 max-w-3xl">
+                Shodibazar is redefining the Bangladeshi e-grocery landscape by integrating strict "Safe Food" protocols. 
+                This dashboard analyzes the correlation between food safety compliance, supply chain integrity, and business growth.
+            </p>
+        </div>
+
+        <!-- KPI Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- KPI 1 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-emerald-500 hover:shadow-md transition-shadow">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Revenue</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1">৳ 6.8M</h3>
+                    </div>
+                    <span class="text-emerald-500 bg-emerald-50 px-2 py-1 rounded text-xs font-bold">+24%</span>
+                </div>
+                <p class="text-sm text-gray-500 mt-4">Current Quarter (Projected)</p>
+            </div>
+
+            <!-- KPI 2 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-amber-500 hover:shadow-md transition-shadow">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Partner Farms</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1">45+</h3>
+                    </div>
+                    <span class="text-amber-500 bg-amber-50 px-2 py-1 rounded text-xs font-bold">Verified</span>
+                </div>
+                <p class="text-sm text-gray-500 mt-4">100% Traceability</p>
+            </div>
+
+            <!-- KPI 3 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-blue-500 hover:shadow-md transition-shadow">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Active Users</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1">12.5K</h3>
+                    </div>
+                    <span class="text-blue-500 bg-blue-50 px-2 py-1 rounded text-xs font-bold">+18%</span>
+                </div>
+                <p class="text-sm text-gray-500 mt-4">MoM Growth</p>
+            </div>
+
+            <!-- KPI 4 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-red-500 hover:shadow-md transition-shadow">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Chemical Tolerance</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1">0%</h3>
+                    </div>
+                    <span class="text-red-500 bg-red-50 px-2 py-1 rounded text-xs font-bold">Strict</span>
+                </div>
+                <p class="text-sm text-gray-500 mt-4">Formalin/Carbide Free</p>
+            </div>
+        </div>
+
+        <!-- Product Mix Chart (Overview) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-bold text-gray-800">Revenue Contribution by Category</h3>
+                    <div class="flex items-center space-x-2">
+                         <label class="text-xs text-gray-500">Filter:</label>
+                         <select id="categoryFilter" onchange="updateCategoryChart()" class="text-sm border-gray-300 border rounded-md p-1 focus:ring-emerald-500 focus:border-emerald-500">
+                            <option value="all">All Categories</option>
+                            <option value="perishables">Perishables Only</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-emerald-600 p-6 rounded-xl shadow-sm text-white flex flex-col justify-center">
+                <h3 class="text-xl font-bold mb-4">Strategic Insight</h3>
+                <p class="text-emerald-100 mb-6 leading-relaxed">
+                    Unlike competitors driving volume with electronics, Shodibazar's dominance in <strong class="text-white">Perishables (65%)</strong> proves that consumer trust in "Safe Food" is a viable, high-frequency business model.
+                </p>
+                <button onclick="showSection('supply-chain')" class="bg-white text-emerald-700 font-bold py-3 px-4 rounded hover:bg-emerald-50 transition-colors w-full shadow-lg">
+                    View Safety Protocols
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2: FINANCIAL TRENDS -->
+    <section id="financials" class="hidden-section max-w-7xl mx-auto">
+        <div class="mb-8 flex flex-col md:flex-row justify-between md:items-end">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-800">Financial Performance</h2>
+                <p class="text-gray-600 mt-2">Revenue trajectory showing the impact of the "Certified Safe" campaign.</p>
+            </div>
+            <div class="flex space-x-2 mt-4 md:mt-0">
+                <button onclick="toggleTimeframe('quarterly')" id="btn-quarterly" class="px-4 py-2 bg-emerald-600 text-white text-sm font-bold rounded shadow-sm hover:bg-emerald-700 transition-colors">Quarterly</button>
+                <button onclick="toggleTimeframe('monthly')" id="btn-monthly" class="px-4 py-2 bg-white text-gray-600 text-sm font-bold rounded border border-gray-200 hover:bg-gray-50 transition-colors">Monthly</button>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm mb-6 border border-gray-100">
+            <div class="chart-container">
+                <canvas id="financialChart"></canvas>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-emerald-500">
+                <h4 class="font-bold text-gray-800">Growth Driver</h4>
+                <p class="text-sm text-gray-600 mt-2">The sharp uptake in Q3 2024 coincides with the partnership expansion to 15 new organic farms in Bogra.</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-amber-500">
+                <h4 class="font-bold text-gray-800">Seasonality</h4>
+                <p class="text-sm text-gray-600 mt-2">Winter months (Q4 & Q1) show 30% higher basket sizes due to seasonal vegetable availability.</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-blue-500">
+                <h4 class="font-bold text-gray-800">Retention</h4>
+                <p class="text-sm text-gray-600 mt-2">72% of revenue comes from repeat customers, stabilizing cash flow against ad-spend fluctuations.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: SUPPLY CHAIN -->
+    <section id="supply-chain" class="hidden-section max-w-7xl mx-auto">
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-gray-800">The "Safe Food" Protocol</h2>
+            <p class="text-gray-600 mt-2">Interactive breakdown of the farm-to-fork journey. Click a step to see compliance details.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Interactive List -->
+            <div class="space-y-4">
+                <div class="process-card process-active bg-emerald-50 p-4 rounded-lg shadow-sm" onclick="showProcessDetail(0, this)">
+                    <div class="flex items-center">
+                        <span class="bg-emerald-200 text-emerald-800 font-bold rounded-full w-8 h-8 flex items-center justify-center mr-4">1</span>
+                        <div>
+                            <h4 class="font-bold text-gray-800">Contract Farming</h4>
+                            <p class="text-xs text-gray-500">Source Verification</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="process-card bg-white p-4 rounded-lg shadow-sm" onclick="showProcessDetail(1, this)">
+                    <div class="flex items-center">
+                        <span class="bg-gray-100 text-gray-600 font-bold rounded-full w-8 h-8 flex items-center justify-center mr-4">2</span>
+                        <div>
+                            <h4 class="font-bold text-gray-800">Collection & Testing</h4>
+                            <p class="text-xs text-gray-500">Quality Control</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="process-card bg-white p-4 rounded-lg shadow-sm" onclick="showProcessDetail(2, this)">
+                    <div class="flex items-center">
+                        <span class="bg-gray-100 text-gray-600 font-bold rounded-full w-8 h-8 flex items-center justify-center mr-4">3</span>
+                        <div>
+                            <h4 class="font-bold text-gray-800">Processing & Packaging</h4>
+                            <p class="text-xs text-gray-500">Hygiene Standards</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="process-card bg-white p-4 rounded-lg shadow-sm" onclick="showProcessDetail(3, this)">
+                    <div class="flex items-center">
+                        <span class="bg-gray-100 text-gray-600 font-bold rounded-full w-8 h-8 flex items-center justify-center mr-4">4</span>
+                        <div>
+                            <h4 class="font-bold text-gray-800">Cold Chain Delivery</h4>
+                            <p class="text-xs text-gray-500">Last Mile</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detail View -->
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-lg p-8 relative overflow-hidden border border-gray-100">
+                <div class="absolute top-0 right-0 p-4 opacity-5 text-9xl pointer-events-none">🌿</div>
+                
+                <div class="relative z-10">
+                    <span id="process-badge" class="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full mb-4">Step 1</span>
+                    <h3 id="process-title" class="text-2xl font-bold text-emerald-700 mb-4">Contract Farming</h3>
+                    <p id="process-desc" class="text-gray-600 text-lg mb-8 leading-relaxed">
+                        Shodibazar works directly with farmers in <strong>Jessore and Bogra</strong>. We provide organic fertilizers and seeds to ensure the input is chemical-free from day one.
+                    </p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-gray-50 p-5 rounded-lg border border-gray-100">
+                            <h5 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Key Checkpoint</h5>
+                            <div class="flex items-center mt-2">
+                                <span class="text-xl mr-2">🎯</span>
+                                <p id="process-checkpoint" class="font-semibold text-gray-800">Soil pH Testing</p>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 p-5 rounded-lg border border-gray-100">
+                            <h5 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Critical Stat</h5>
+                            <div class="flex items-center mt-2">
+                                <span class="text-xl mr-2">📉</span>
+                                <p id="process-stat" class="font-semibold text-red-500">12% Rejection Rate</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 4: MARKET COMPARISON -->
+    <section id="comparison" class="hidden-section max-w-7xl mx-auto">
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-gray-800">Market Positioning</h2>
+            <p class="text-gray-600 mt-2">Visualizing the trade-offs: Shodibazar vs. Traditional Wet Markets.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+            <div>
+                <div class="chart-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+                <div class="mt-4 text-center text-sm text-gray-500 italic">
+                    Scale: 1 (Poor) to 10 (Excellent)
+                </div>
+            </div>
+            <div class="space-y-6">
+                <div class="bg-emerald-50 p-6 rounded-xl border border-emerald-100">
+                    <h3 class="text-lg font-bold text-emerald-800 flex items-center">
+                        <span class="bg-emerald-200 text-emerald-700 p-1 rounded-full mr-3 text-xs">✔</span>
+                        Hygiene & Traceability
+                    </h3>
+                    <p class="text-emerald-900 mt-2 text-sm leading-relaxed">
+                        Shodibazar scores near-perfect (9.5) on hygiene. Wet markets suffer from poor waste management and lack of source verification.
+                    </p>
+                </div>
+                <div class="bg-amber-50 p-6 rounded-xl border border-amber-100">
+                    <h3 class="text-lg font-bold text-amber-800 flex items-center">
+                        <span class="bg-amber-200 text-amber-700 p-1 rounded-full mr-3 text-xs">!</span>
+                        The Price Factor
+                    </h3>
+                    <p class="text-amber-900 mt-2 text-sm leading-relaxed">
+                        Our prices are ~15% higher. The Radar chart shows "Price Affordability" as our lowest metric vs markets. This is the calculated "Cost of Safety."
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 5: CUSTOMER INSIGHTS -->
+    <section id="customers" class="hidden-section max-w-7xl mx-auto">
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-gray-800">Customer Analysis (RFM)</h2>
+            <p class="text-gray-600 mt-2">
+                Segmentation by Frequency (X) and Recency (Y).
+                <strong class="text-emerald-600">Bubble Size = Total Spend</strong>.
+            </p>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+            <!-- Legend -->
+            <div class="flex flex-wrap gap-6 mb-6 justify-center bg-gray-50 p-3 rounded-lg">
+                <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-emerald-500 mr-2 shadow-sm"></span><span class="text-sm font-semibold text-gray-700">Champions (Loyal)</span></div>
+                <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-amber-500 mr-2 shadow-sm"></span><span class="text-sm font-semibold text-gray-700">At Risk (Dormant)</span></div>
+                <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-gray-400 mr-2 shadow-sm"></span><span class="text-sm font-semibold text-gray-700">New/Low Value</span></div>
+            </div>
+
+            <!-- Explicit Height for Bubble Chart -->
+            <div class="chart-container" style="height: 500px; max-height: 500px;">
+                <canvas id="rfmBubbleChart"></canvas>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 text-center">
+                <div class="p-4 bg-emerald-50 rounded border border-emerald-100">
+                    <h4 class="font-bold text-emerald-800">Champions</h4>
+                    <p class="text-xs text-emerald-600 mt-1">Buy weekly. Average basket ৳2500.</p>
+                </div>
+                <div class="p-4 bg-amber-50 rounded border border-amber-100">
+                    <h4 class="font-bold text-amber-800">Strategy</h4>
+                    <p class="text-xs text-amber-600 mt-1">Subscription models for staples.</p>
+                </div>
+                <div class="p-4 bg-gray-100 rounded border border-gray-200">
+                    <h4 class="font-bold text-gray-700">Opportunity</h4>
+                    <p class="text-xs text-gray-500 mt-1">Reactivate "At Risk" with flash sales.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- JAVASCRIPT LOGIC -->
+<script>
+    // --- NAVIGATION LOGIC ---
+    function showSection(sectionId) {
+        // Update Menu
+        document.querySelectorAll('.nav-item').forEach(el => {
+            el.classList.remove('active', 'bg-emerald-50', 'text-emerald-600', 'border-r-4', 'border-emerald-600');
+        });
+        const activeBtn = document.querySelector(`button[onclick="showSection('${sectionId}')"]`);
+        if(activeBtn) {
+            activeBtn.classList.add('active', 'bg-emerald-50', 'text-emerald-600', 'border-r-4', 'border-emerald-600');
+        }
+
+        // Update Section Visibility
+        document.querySelectorAll('section').forEach(el => {
+            el.classList.remove('visible-section');
+            el.classList.add('hidden-section');
+        });
+        const activeSection = document.getElementById(sectionId);
+        activeSection.classList.remove('hidden-section');
+        activeSection.classList.add('visible-section');
+        
+        // Re-render hidden charts to fix dimension bugs on toggle
+        if(sectionId === 'comparison' || sectionId === 'customers') {
+            window.dispatchEvent(new Event('resize'));
+        }
+    }
+
+    // --- LABEL WRAPPING UTILITY ---
+    function formatLabel(str, maxwidth) {
+        if (typeof str !== 'string' || str.length <= maxwidth) return str;
+        const words = str.split(" ");
+        const sections = [];
+        let temp = "";
+        words.forEach((item, index) => {
+            if (temp.length > 0) {
+                const concat = temp + ' ' + item;
+                if (concat.length > maxwidth) {
+                    sections.push(temp);
+                    temp = "";
+                } else {
+                    temp = concat;
+                    if (index === words.length - 1) sections.push(concat);
+                    return;
+                }
+            }
+            if (index === words.length - 1) {
+                sections.push(item);
+                return;
+            }
+            if (item.length < maxwidth) temp = item;
+            else sections.push(item);
+        });
+        return sections;
+    }
+
+    // --- CHART CONFIGURATION ---
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            tooltip: {
+                backgroundColor: 'rgba(31, 41, 55, 0.95)',
+                padding: 12,
+                cornerRadius: 8,
+                titleFont: { size: 14, family: 'Inter', weight: 'bold' },
+                bodyFont: { size: 13, family: 'Inter' },
+                callbacks: {
+                    title: function(tooltipItems) {
+                        const item = tooltipItems[0];
+                        const label = item.chart.data.labels[item.dataIndex];
+                        return Array.isArray(label) ? label.join(' ') : label;
+                    }
+                }
+            },
+            legend: {
+                labels: { font: { family: 'Inter', size: 12 }, usePointStyle: true, padding: 20 }
+            }
+        }
+    };
+
+    // --- 1. PRODUCT MIX CHART (DOUGHNUT) ---
+    const ctxCategory = document.getElementById('categoryChart').getContext('2d');
+    const catDataAll = [35, 25, 20, 10, 10];
+    const catDataPerish = [55, 45, 0, 0, 0];
+    const catLabels = ['Organic Vegetables', 'Fresh Fish & Meat', 'Spices & Oils', 'Dairy', 'Fruits'];
+    
+    let categoryChart = new Chart(ctxCategory, {
+        type: 'doughnut',
+        data: {
+            labels: catLabels.map(l => formatLabel(l, 16)),
+            datasets: [{
+                data: catDataAll,
+                backgroundColor: ['#10B981', '#34D399', '#F59E0B', '#60A5FA', '#A78BFA'],
+                borderWidth: 0,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            ...commonOptions,
+            cutout: '70%',
+            plugins: {
+                ...commonOptions.plugins,
+                legend: { position: 'right', labels: { usePointStyle: true } }
+            }
+        }
+    });
+
+    function updateCategoryChart() {
+        const filter = document.getElementById('categoryFilter').value;
+        if (filter === 'perishables') {
+            categoryChart.data.datasets[0].data = catDataPerish;
+            categoryChart.data.labels = ['Organic Vegetables', 'Fresh Fish & Meat', '', '', ''].map(l => formatLabel(l, 16));
+            categoryChart.data.datasets[0].backgroundColor = ['#10B981', '#34D399', '#E5E7EB', '#E5E7EB', '#E5E7EB'];
+        } else {
+            categoryChart.data.datasets[0].data = catDataAll;
+            categoryChart.data.labels = catLabels.map(l => formatLabel(l, 16));
+            categoryChart.data.datasets[0].backgroundColor = ['#10B981', '#34D399', '#F59E0B', '#60A5FA', '#A78BFA'];
+        }
+        categoryChart.update();
+    }
+
+    // --- 2. FINANCIAL CHART (LINE) ---
+    const ctxFin = document.getElementById('financialChart').getContext('2d');
+    const dataQuarterly = [12, 15, 18, 28, 32, 40, 55, 68];
+    const labelsQuarterly = ['Q1 23', 'Q2 23', 'Q3 23', 'Q4 23', 'Q1 24', 'Q2 24', 'Q3 24', 'Q4 24'];
+    
+    const dataMonthly = [4, 5, 3, 5, 6, 4, 6, 6, 6, 9, 10, 9, 10, 11, 11, 13, 14, 13, 18, 19, 18, 22, 23, 23]; // Simulated
+    const labelsMonthly = Array.from({length: 24}, (_, i) => `M${i+1}`);
+
+    let finChart = new Chart(ctxFin, {
+        type: 'line',
+        data: {
+            labels: labelsQuarterly,
+            datasets: [{
+                label: 'Revenue (Lakh BDT)',
+                data: dataQuarterly,
+                borderColor: '#10B981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderWidth: 3,
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#059669',
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            ...commonOptions,
+            scales: {
+                y: { beginAtZero: true, grid: { borderDash: [5, 5], color: '#F3F4F6' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    function toggleTimeframe(frame) {
+        document.getElementById('btn-quarterly').className = frame === 'quarterly' ? "px-4 py-2 bg-emerald-600 text-white text-sm font-bold rounded shadow-sm hover:bg-emerald-700 transition-colors" : "px-4 py-2 bg-white text-gray-600 text-sm font-bold rounded border border-gray-200 hover:bg-gray-50 transition-colors";
+        document.getElementById('btn-monthly').className = frame === 'monthly' ? "px-4 py-2 bg-emerald-600 text-white text-sm font-bold rounded shadow-sm hover:bg-emerald-700 transition-colors" : "px-4 py-2 bg-white text-gray-600 text-sm font-bold rounded border border-gray-200 hover:bg-gray-50 transition-colors";
+
+        if (frame === 'monthly') {
+            finChart.data.labels = labelsMonthly;
+            finChart.data.datasets[0].data = dataMonthly;
+        } else {
+            finChart.data.labels = labelsQuarterly;
+            finChart.data.datasets[0].data = dataQuarterly;
+        }
+        finChart.update();
+    }
+
+    // --- 3. RADAR CHART ---
+    const ctxRadar = document.getElementById('radarChart').getContext('2d');
+    const radarLabels = ['Hygiene', 'Traceability', 'Freshness', 'Packaging', 'Price', 'Chemical-Free'];
+    
+    new Chart(ctxRadar, {
+        type: 'radar',
+        data: {
+            labels: radarLabels.map(l => formatLabel(l, 16)),
+            datasets: [{
+                label: 'Shodibazar',
+                data: [9.5, 9, 8.5, 9, 6, 9.8],
+                borderColor: '#10B981',
+                backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                pointBackgroundColor: '#10B981'
+            }, {
+                label: 'Wet Market',
+                data: [4, 2, 7, 3, 9, 4],
+                borderColor: '#9CA3AF',
+                backgroundColor: 'rgba(156, 163, 175, 0.2)',
+                pointBackgroundColor: '#9CA3AF'
+            }]
+        },
+        options: {
+            ...commonOptions,
+            scales: {
+                r: {
+                    angleLines: { color: '#E5E7EB' },
+                    grid: { color: '#E5E7EB' },
+                    pointLabels: { font: { family: 'Inter', size: 12, weight: 600 }, color: '#374151' },
+                    suggestedMin: 0, suggestedMax: 10
+                }
+            }
+        }
+    });
+
+    // --- 4. BUBBLE CHART (RFM) ---
+    const ctxBubble = document.getElementById('rfmBubbleChart').getContext('2d');
+    
+    // Data logic: 
+    // X = Frequency (Orders per year) - Higher is better (Right)
+    // Y = Recency (Days since last order) - Lower is better (Top)
+    // R = Value (Spend)
+    
+    const champions = [
+        {x: 20, y: 5, r: 25}, {x: 18, y: 12, r: 20}, {x: 25, y: 7, r: 30}, {x: 22, y: 3, r: 28},
+        {x: 16, y: 10, r: 22}, {x: 21, y: 8, r: 26}
+    ];
+    const atRisk = [
+        {x: 15, y: 65, r: 18}, {x: 12, y: 50, r: 15}, {x: 18, y: 70, r: 22}, {x: 14, y: 80, r: 16}
+    ];
+    const newLow = [
+        {x: 2, y: 15, r: 5}, {x: 1, y: 20, r: 4}, {x: 3, y: 10, r: 6}, {x: 2, y: 25, r: 5},
+        {x: 1, y: 5, r: 3}, {x: 4, y: 30, r: 7}
+    ];
+
+    new Chart(ctxBubble, {
+        type: 'bubble',
+        data: {
+            datasets: [
+                {
+                    label: 'Champions (High Freq/Recent)',
+                    data: champions,
+                    backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                    borderColor: '#065F46'
+                },
+                {
+                    label: 'At Risk (Good Freq/Dormant)',
+                    data: atRisk,
+                    backgroundColor: 'rgba(245, 158, 11, 0.7)',
+                    borderColor: '#B45309'
+                },
+                {
+                    label: 'New / Occasional',
+                    data: newLow,
+                    backgroundColor: 'rgba(156, 163, 175, 0.7)',
+                    borderColor: '#4B5563'
+                }
+            ]
+        },
+        options: {
+            ...commonOptions,
+            scales: {
+                x: {
+                    title: { display: true, text: 'Frequency (Total Orders)', font: { weight: 'bold' } },
+                    min: 0, max: 30,
+                    grid: { color: '#F3F4F6' }
+                },
+                y: {
+                    title: { display: true, text: 'Recency (Days Since Last Order)', font: { weight: 'bold' } },
+                    reverse: true, // IMPORTANT: Lower days = Higher up the chart (Better)
+                    min: 0, max: 90,
+                    grid: { color: '#F3F4F6' }
+                }
+            },
+            plugins: {
+                ...commonOptions.plugins,
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label} | Spend: ৳${context.raw.r * 100}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // --- INTERACTIVE PROCESS LOGIC ---
+    const processData = [
+        {
+            title: "Contract Farming",
+            desc: "Shodibazar works directly with farmers in Jessore and Bogra. We provide organic fertilizers and seeds to ensure the input is chemical-free from day one.",
+            checkpoint: "Soil pH Testing",
+            stat: "12% Rejection Rate"
+        },
+        {
+            title: "Collection & Testing",
+            desc: "At regional hubs, every batch undergoes rapid testing for Formalin and Carbide. Any batch exceeding 0% tolerance is immediately discarded.",
+            checkpoint: "Formalin Kit Test",
+            stat: "0.5% Batches Failed"
+        },
+        {
+            title: "Processing & Packaging",
+            desc: "Vegetables are sorted, washed with ozonized water, and vacuum sealed. Fish is processed in temperature-controlled rooms.",
+            checkpoint: "Vacuum Sealing",
+            stat: "4hr Processing Time"
+        },
+        {
+            title: "Cold Chain Delivery",
+            desc: "From the hub to the doorstep, items travel in insulated vans maintained at 4°C to prevent bacterial growth without preservatives.",
+            checkpoint: "Temp Logging",
+            stat: "99% On-Time"
+        }
+    ];
+
+    function showProcessDetail(index, element) {
+        // Update Card Styles
+        document.querySelectorAll('.process-card').forEach(el => {
+            el.classList.remove('process-active', 'bg-emerald-50');
+            el.classList.add('bg-white');
+            // Reset numbered badges
+            const badge = el.querySelector('span');
+            badge.classList.remove('bg-emerald-200', 'text-emerald-800');
+            badge.classList.add('bg-gray-100', 'text-gray-600');
+        });
+        
+        element.classList.remove('bg-white');
+        element.classList.add('process-active', 'bg-emerald-50');
+        const activeBadge = element.querySelector('span');
+        activeBadge.classList.remove('bg-gray-100', 'text-gray-600');
+        activeBadge.classList.add('bg-emerald-200', 'text-emerald-800');
+
+        // Update Content
+        const data = processData[index];
+        document.getElementById('process-badge').innerText = "Step " + (index + 1);
+        document.getElementById('process-title').innerText = data.title;
+        document.getElementById('process-desc').innerText = data.desc;
+        document.getElementById('process-checkpoint').innerText = data.checkpoint;
+        document.getElementById('process-stat').innerText = data.stat;
+    }
+
+</script>
+</body> </html>
